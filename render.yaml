@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: beautypulse-ai
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: ENABLE_DEMO_SEED
+        value: "true"
+      - key: ENABLE_REVIEW_EMBEDDINGS
+        value: "true"
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: OPENAI_EMBEDDING_MODEL
+        value: text-embedding-3-small
+      - key: DATABASE_URL
+        fromDatabase:
+          name: beautypulse-db
+          property: connectionString
+
+databases:
+  - name: beautypulse-db
+    databaseName: beautypulse
+    user: beautypulse
+    plan: free
+    postgresMajorVersion: "16"

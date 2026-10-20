@@ -1,0 +1,1 @@
+"""BeautyPulse AI application package."""

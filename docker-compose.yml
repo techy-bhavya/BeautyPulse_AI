@@ -1,0 +1,35 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: beautypulse
+      POSTGRES_USER: beautypulse
+      POSTGRES_PASSWORD: beautypulse
+    ports:
+      - "5432:5432"
+    volumes:
+      - beautypulse_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U beautypulse -d beautypulse"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgresql+psycopg://beautypulse:beautypulse@db:5432/beautypulse
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+      ENABLE_DEMO_SEED: "true"
+      ENABLE_REVIEW_EMBEDDINGS: ${ENABLE_REVIEW_EMBEDDINGS:-true}
+      CORS_ORIGINS: "*"
+    ports:
+      - "8000:10000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  beautypulse_pgdata:
